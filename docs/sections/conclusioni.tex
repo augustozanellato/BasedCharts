@@ -1,0 +1,66 @@
+\section{Conclusioni}
+\subsection{Timeline e conteggio ore di lavoro}
+Il progetto è stato iniziato a fine Novembre poco dopo la presentazione, in quel momento sono stati analizzati i
+requisiti e abbozzata la \textbf{GUI}.\\
+Per quanto riguarda il computo delle ore di lavoro sono state necessarie \textbf{22 ore aggiuntive} rispetto alle
+\textbf{50 ore} previste dalla specifica di progetto, dovute principalmente al perfezionamento delle funzionalità e
+dell'interfaccia nonché al miglioramento della struttura del codice.\\
+
+\begin{center}
+    \begin{longtable}{ |l||r| }
+        \hline
+        \textbf{Fase progettuale} & \textbf{Ore impiegate} \\
+        \hline
+        Analisi delle specifiche & 3 \\
+        Setup toolchain & 3 \\
+        Progettazione e bozza GUI & 6 \\
+        Studio del framework Qt & 8 \\
+        Progettazione, implementazione e unit testing della struttura dati & 10 \\
+        Progettazione e implementazione del modello & 8 \\
+        Progettazione e implementazione della gerarchia relativa ai grafici & 10 \\
+        Implementazione del salvataggio e caricamento dei dati in JSON & 8 \\
+        Sviluppo del wizard di creazione del grafico & 2 \\
+        Test e debugging\footnote{Stima molto approssimativa in quanto sono stati distribuiti durante tutto lo sviluppo}
+            & 6 \\
+        Stesura documentazione & 8 \\
+        \hline
+        \textbf{Ore Totali} & \textbf{72 ore} \\
+        \hline
+    \end{longtable}
+\end{center}
+
+\subsection{Ambiente di sviluppo}
+Nello sviluppo del progetto si è scelto di utilizzare come IDE \textbf{CLion}, un ambiente professionale sviluppato
+dalla compagnia JetBrains, essendo a pagamento è stata utilizzata una licenza gentilmente messa a disposizione dagli
+sviluppatori mediante il loro \href{https://www.jetbrains.com/community/education/#students}{programma per studenti}.
+Questa scelta ha portato inoltre all'uso di \textbf{CMake} come \textit{build automation system} e di \textbf{Ninja}
+come \textit{build system} invece dell'accoppiata \textbf{QMake}\footnote{Inoltre QMake sembra essere in via di
+abbandono dagli sviluppatori di Qt, con l'ultima versione \textit{major} di Qt (6.0) sono infatti passati ad usare CMake
+per gestire le build di Qt stesso}-\textbf{Make}; questa scelta è stata presa anche per prendere confidenza con il tooling
+\textit{standard de-facto} utilizzato nello sviluppo in C++.\\
+L'utilizzo di CMake ha permesso inoltre l'uso agevole ed integrato con l'IDE di \textit{linter} e \textit{static
+analyzers}.\\
+Lo sviluppo è avvenuto usando l'ultima versione di \textbf{Qt5 (5.15.2)} \footnote{Fortunatamente questo ha portato solo
+ad esattamente due incompatibilità con la versione \textit{target} di Qt, entrambe risolte rapidamente.} e l'ultima
+versione di \textbf{Clang (13.0.1)} in esecuzione su \textbf{Arch Linux}; sono stati effettuati anche periodici test
+sulla macchina virtuale del corso\footnote{Degno di nota è il fatto che l'installazione di Qt sulla VM non è
+completa, mancano molti pacchetti presenti nella distribuzione di default di Qt e soprattutto il pacchetto
+\texttt{qt5-default}, indispensabile per far compilare il progetto a \textbf{QMake}}.
+
+\subsection{Compilazione ed esecuzione}
+È stata resa possibile la compilazione del progetto anche con \textbf{QMake} mediante file \texttt{.pro}, di seguito
+le istruzioni:
+\begin{minted}{bash}
+    $ qmake
+    $ make
+\end{minted}
+L'esecuzione di questi comandi porta alla compilazione del progetto con destinazione \texttt{./BasedCharts} dove
+\texttt{.} è la cartella dove è presente il file \texttt{.pro}, tutti i file intermedi generati dalla toolchain di Qt
+e dal compilatore sono posti nella cartella \texttt{./build/qmake}.
+
+\subsection{Note finali}
+Lo sviluppo del progetto è stato un'attività molto interessante che mi ha coinvolto molto piacevolmente, credo
+andrebbero inseriti più progetti del genere nel curriculum universitario.\\
+Le maggiori difficoltà incontrate nello sviluppo sono state dovute alla documentazione lacunosa di Qt, soprattutto per
+quanto riguarda l'uso dei \textit{ModelMapper}, si sono presentate diverse occasioni in cui è stato più produttivo
+visionare i sorgenti di Qt rispetto a leggere la documentazione.

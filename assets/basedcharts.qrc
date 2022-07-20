@@ -1,0 +1,41 @@
+<RCC>
+    <qresource>
+        <file>icons/exit.svg</file>
+
+        <file>icons/+dark/chart-type-bar.png</file>
+        <file>icons/+dark/chart-type-line.png</file>
+        <file>icons/+dark/chart-type-spline.png</file>
+        <file>icons/+dark/chart-type-scatter.png</file>
+        <file>icons/+dark/minus-circle.svg</file>
+        <file>icons/+dark/new-chart.svg</file>
+        <file>icons/+dark/open.svg</file>
+        <file>icons/+dark/palette.svg</file>
+        <file>icons/+dark/plus-circle.svg</file>
+        <file>icons/+dark/save.svg</file>
+        <file>icons/+dark/save-as.svg</file>
+        <file>icons/+dark/table-cog.svg</file>
+        <file>icons/+dark/table-column-plus.svg</file>
+        <file>icons/+dark/table-column-remove.svg</file>
+        <file>icons/+dark/table-row-plus.svg</file>
+        <file>icons/+dark/table-row-remove.svg</file>
+        <file>icons/+dark/theme-selection.svg</file>
+
+        <file>icons/+light/chart-type-bar.png</file>
+        <file>icons/+light/chart-type-line.png</file>
+        <file>icons/+light/chart-type-spline.png</file>
+        <file>icons/+light/chart-type-scatter.png</file>
+        <file>icons/+light/minus-circle.svg</file>
+        <file>icons/+light/new-chart.svg</file>
+        <file>icons/+light/open.svg</file>
+        <file>icons/+light/palette.svg</file>
+        <file>icons/+light/plus-circle.svg</file>
+        <file>icons/+light/save.svg</file>
+        <file>icons/+light/save-as.svg</file>
+        <file>icons/+light/table-cog.svg</file>
+        <file>icons/+light/table-column-plus.svg</file>
+        <file>icons/+light/table-column-remove.svg</file>
+        <file>icons/+light/table-row-plus.svg</file>
+        <file>icons/+light/table-row-remove.svg</file>
+        <file>icons/+light/theme-selection.svg</file>
+    </qresource>
+</RCC>

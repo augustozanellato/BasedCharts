@@ -1,0 +1,52 @@
+\documentclass[a4paper]{article}
+\usepackage{fontspec}
+\usepackage[italian]{babel}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{subfiles}
+\usepackage{xparse}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage{longtable}
+\usepackage[outputdir=../build/docs]{minted}
+\graphicspath{{../images/}}
+\setmainfont{texgyrepagella}[
+    Extension = .otf,
+    UprightFont = *-regular,
+    BoldFont = *-bold,
+    ItalicFont = *-italic,
+    BoldItalicFont = *-bolditalic,
+]
+\hypersetup{
+    unicode=true,
+    pdftitle={BasedCharts},
+    pdfauthor={Augusto Zanellato},
+    linkcolor=cyan,
+    linkbordercolor=cyan,
+    urlcolor=blue,
+}
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+\begin{document}{\rowcolors{3}{gray!10!white!90}{white}
+\pagenumbering{gobble}
+\title{
+    \includegraphics[scale=0.8]{images/unipd}\\\bigskip
+    BasedCharts\footnote{
+        Significato di \textit{Based} (da \href{https://web.archive.org/web/20211229133925/https://www.urbandictionary.com/define.php?term=based}{UrbanDictionary}): A word used when you want to recognize someone for being themselves, i.e. courageous and unique or not caring what others think.
+    }\\
+    \small Progetto di Programmazione ad Oggetti
+}
+\author{Augusto Zanellato\\\small2000555}
+\date{Anno Accademico 2021/2022}
+\maketitle
+\clearpage
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+\subfile{sections/introduzione}
+\subfile{sections/architettura}
+\subfile{sections/conclusioni}
+\end{document}

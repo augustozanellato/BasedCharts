@@ -1,0 +1,52 @@
+\section{Introduzione al progetto}
+\subsection{Abstract}
+Si vuole realizzare un'applicazione che permette di lavorare con vari tipi di grafici usando il framework Qt in C++.
+Le operazioni implementate sono:
+\begin{itemize}
+    \item Creazione
+    \item Salvataggio
+    \item Caricamento da file
+    \item Modifica dei dati
+    \item Modifica degli attributi del grafico, come ad esempio:
+    \begin{itemize}
+        \item Colore delle serie di dati
+        \item Range degli assi con eventuale autoscaling
+        \item Titolo del grafico
+        \item Titolo degli assi
+    \end{itemize}
+    \item Passaggio tra tema chiaro e scuro
+\end{itemize}
+I tipi di grafico supportati sono:
+\begin{itemize}
+    \item Barre
+    \item Linea (ad assi X collegati o indipendenti)
+    \item Dispersione (detto anche Scatter) (ad assi X collegati o indipendenti)
+    \item Spline (ad assi X collegati o indipendenti)
+\end{itemize}
+Ogni tipo di grafico supporta l'uso contemporaneo di multiple serie di dati.
+\subsection{Implementazione}
+Le scelte architetturali più significative del progetto sono:
+\begin{itemize}
+    \item Supporto all'uso di schede per operare su più file contemporaneamente
+    \item Utilizzo di JSON come formato di salvataggio dei dati
+    \item Utilizzo del paradigma Model-View
+    \item Lo sviluppo del contenitore custom \texttt{Vector2D} da utilizzare come storage per il modello
+    \item Utilizzo di unit test per le parti più prone a bug, come ad esempio la struttura di dati \texttt{Vector2D}
+    \item Utilizzo di linter (nello specifico \texttt{clang-tidy} e \texttt{clazy}) per evidenziare possibili bug o brutture
+    \item Utilizzo dei \textit{sanitizer}\footnote{Di particolare interesse sono stati
+              \href{https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html}{UBSan},
+              \href{https://clang.llvm.org/docs/MemorySanitizer.html}{MSan} ed
+              \href{https://clang.llvm.org/docs/AddressSanitizer.html}{ASan}
+          } di \textbf{clang} durante lo sviluppo per rilevare eventuali
+          \textit{undefined behavior} o accessi in memoria non validi e/o malformati.
+    \item Supporto dell'applicazione a temi multipli
+    \item Uso del pattern \textit{Self-Registering Factory} (per ulteriori dettagli si veda~\ref{subsec:factory})
+    \item Ampio utilizzo di \textit{namespace} per separare logicamente il codice.
+\end{itemize}
+Nella cartella \texttt{examples/} vengono forniti alcuni grafici di esempio, nella sottocartella
+\texttt{examples/invalid/} sono presenti alcuni file \textbf{non validi} usati per testare la correttezza della logica
+di deserializzazione.\\
+\noindent
+\textbf{NOTA:} si è scelto di non fornire un manuale d'uso dell'applicazione in quanto la GUI è molto autoesplicativa
+dato che passando il cursore del mouse sulla maggior parte dei pulsanti appare nella \textit{status bar} in basso una
+breve descrizione del comportamento del pulsante in questione.

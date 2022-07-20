@@ -1,0 +1,115 @@
+{
+    "axes": {
+        "x": {
+            "label": "Grade",
+            "manualMax": 30,
+            "manualMin": 0,
+            "minorTicks": 4,
+            "ticks": 4,
+            "type": 2
+        },
+        "y": {
+            "label": "Hours Studied",
+            "manualMax": 50,
+            "manualMin": 0,
+            "minorTicks": 0,
+            "ticks": 5,
+            "type": 1
+        }
+    },
+    "colors": [
+        null,
+        {
+            "a": 255,
+            "b": 223,
+            "g": 159,
+            "r": 32
+        }
+    ],
+    "columns": [
+        "X",
+        "Student"
+    ],
+    "data": [
+        [
+            20,
+            16
+        ],
+        [
+            17,
+            24
+        ],
+        [
+            13,
+            24
+        ],
+        [
+            21,
+            26
+        ],
+        [
+            29,
+            48
+        ],
+        [
+            30,
+            46
+        ],
+        [
+            10,
+            16
+        ],
+        [
+            11,
+            12
+        ],
+        [
+            27,
+            50
+        ],
+        [
+            16,
+            24
+        ],
+        [
+            22,
+            32
+        ],
+        [
+            23,
+            42
+        ],
+        [
+            25,
+            36
+        ],
+        [
+            14,
+            16
+        ],
+        [
+            18,
+            20
+        ]
+    ],
+    "independentX": false,
+    "rows": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    "title": "Exam Stats",
+    "type": "scatter"
+}

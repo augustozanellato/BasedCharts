@@ -1,0 +1,185 @@
+\section{Architettura}
+Lo sviluppo adotta il pattern \textbf{Model-View} di Qt, non è stato usato il pattern \textbf{MVC}
+(\textbf{Model-View-Controller}) in quanto non direttamente supportato da Qt e avrebbe reso necessario aggirare alcune
+delle limitazioni da esso imposte.
+Oltre alla gerarchia di classi polimorfa usata per gestire i vari tipi di grafico supportati è stato sviluppato anche un
+modello per rappresentare i dati \texttt{ChartDataModel}, una struttura di dati per il salvataggio dei dati inseriti in
+forma tabellare.
+In questa sezione della documentazione verranno analizzate le classi principali e alcune delle scelte progettuali che
+hanno contribuito a definire la gerarchia utilizzata.
+
+\subsection{Progettazione}
+
+\subsubsection{Gerarchia}
+La gerarchia principale del progetto (rappresentata nella figura~\ref{fig:hierarchy}) è quella che interessa le classi
+che gestiscono i vari tipi di grafico.\\
+\begin{figure}[H]
+    \centering
+    \label{fig:hierarchy}
+    \includegraphics{images/hierarchy}
+    \caption{Parte della gerarchia delle classi d'interesse}
+\end{figure} \noindent
+È presente una classe base astratta (\texttt{AbstractChart}) che contiene la logica di base d'inizializzazione e
+gestione di un grafico comune ai vari tipi, \texttt{AbstractChart} eredita inoltre da \texttt{QWidget} in modo da
+renderla utilizzabile come widget di Qt.\\
+\texttt{AbstractChart} contiene dei \textbf{campi pubblici costanti} che vengono inizializzati adeguatamente dalle
+sottoclassi i quali indicano se gli assi X ed Y devono essere personalizzabili oppure no (ad esempio un grafico a barre
+non consente la personalizzazione dell'asse X in quanto contiene delle categorie e non dei valori) e se le
+intestazioni di righe e colonne del modello devono poter essere modificabili.\\
+Ogni sottoclasse di \texttt{AbstractChart} implementa alcuni \textbf{metodi virtuali puri} che forniscono alcune
+informazioni utili al resto del programma, come ad esempio se il grafico corrente richiede un numero pari di colonne nel
+modello (come ad esempio i grafici che estendono \texttt{XYChart} quando sono nella configurazione ad assi X
+indipendenti); altri metodi virtuali puri si occupano di serializzare e deserializzare gli eventuali attributi
+addizionali non presenti in \texttt{AbstractChart}; sono inoltre presenti alcuni \textit{slot} astratti.
+
+\paragraph{XYChart}
+I grafici che estendono \texttt{XYChart} sono quei grafici i cui punti dati possono essere collocati mediante una
+coppia di coordinate cartesiane \textit{(X, Y)}.
+La scelta di usare un'astrazione comune è stata \textit{presa in prestito} da Qt \footnote{Nel modulo Charts di Qt è
+presente una classe base astratta \texttt{QXYSeries} da cui derivano le classi \texttt{QLineSeries},
+\texttt{QScatterSeries} e \texttt{QSplineSeries}}, è risultata una scelta vincente in quanto tutta la logica per gestire
+questo tipo di grafico è in \texttt{XYChart}, le classi che la estendono devono solo implementare due metodi oltre al
+costruttore e alla registrazione con la factory: uno per fornire il tipo dinamico come stringa (si
+veda~\ref{subsec:dynamicType} per chiarimenti) e uno per creare una nuova serie di dati (questo metodo non è altro
+che un sottile wrapper attorno a i costruttori delle relative classi)
+
+\subsubsection{La struttura dati \texttt{Vector2D}}
+Per salvare i dati inseriti nella tabella è stato deciso di sviluppare una struttura dati \textit{ad-hoc} che si
+comporta come un array a 2 dimensioni ma rispetto a quest'ultimo aggiunge alcuni metodi di utilità, come ad esempio la
+rimozione e l'inserimento di righe e colonne in determinate posizioni.\\
+L'implementazione punta ad ottimizzare la località dei dati, viene infatti utilizzato un singolo array allocato
+dinamicamente nello heap, in questo modo tutti i dati contenuti saranno in locazioni di memoria contigue, a differenza
+di quanto si sarebbe ottenuto usando un \texttt{std::vector<std::vector<T>>} (o l'equivalente con \texttt{QVector}), in
+quanto ogni \texttt{std::vector} conterrebbe un puntatore alla locazione contenente i dati, ma nulla assicurerebbe la
+contiguità delle varie locazioni l'una rispetto all'altra.\\
+Dettaglio degno di nota è il fatto che il costruttore di copia è eliminato, questa scelta è volta all'evitare
+onerose copie involontarie causate da sviste o dalla dimenticanza di un \texttt{\&} in qualche firma di metodo.
+
+\subsubsection{Il modello}
+Il modello \texttt{ChartDataModel} estende la classe astratta \texttt{QAbstractTableModel} fornita da Qt, per
+memorizzare i dati della tabella usa un \texttt{Vector2D}.
+Oltre ai già citati dati memorizza anche le intestazioni sia delle righe che delle colonne (se previste ovviamente),
+salva anche eventuali colori di sfondo delle colonne i quali corrispondono ai colori delle corrispondenti serie di dati
+del grafico corrente.\\
+Altri dati salvati dal modello degni di nota sono il numero di colonne minimo e il numero di colonne protette.
+Le colonne minime sono abbastanza autoesplicative, le colonne protette sono invece delle colonne che non possono essere
+eliminate: ad esempio i grafici che estendono \texttt{XYChart} in configurazione ad asse X singolo hanno la prima
+colonna del modello protetta (pur avendo un minimo di due colonne) in quanto eliminare la colonna che contiene i dati
+dell'asse X è un'operazione insensata.\\
+
+
+\subsubsection{\texttt{ThemeableAction}}
+Qt non supporta nativamente icone associate ad un tema che può cambiare a run-time, per aggirare questa limitazione è
+stata sviluppata la classe \texttt{ThemeableAction} che non è altro che un sottile wrapper attorno a \texttt{QAction};
+in aggiunta ha uno slot che viene invocato quando l'applicazione cambia tema che provvede ad aggiornare l'icona della
+\texttt{QAction} in modo da usare le icone appropriate in base al tema in uso.
+
+\subsection{Polimorfismo}
+È stato fatto ampio uso del polimorfismo nella definizione della classe \texttt{AbstractChart}, soprattutto per
+quanto riguarda la serializzazione e deserializzazione dei dati (per ulteriori dettagli si veda~\ref{sec:dataHandling}).
+Altri usi del polimorfismo nell'ambito dei grafici sono ad esempio i metodi usati per determinare valore minimo e
+massimo degli assi quando viene effettuata la scala automatica degli assi.
+Sono inoltre definiti degli slot polimorfi (\texttt{updateLabels} e \texttt{modelResized}) i quali aggiornano il
+grafico in risposta a cambiamenti del modello in modo specifico al tipo di grafico in questione.
+
+\subsection{Gestione dei dati}
+\label{sec:dataHandling}
+Per il salvataggio e il caricamento di dati si è scelto l'uso del formato standard \textbf{JSON} in quanto è leggibile
+da umani e meno verboso rispetto a \textbf{XML}.\\
+L'unico punto a sfavore dell'uso di \textbf{JSON} in Qt è che non è presente il supporto a \textit{JSON Schema} \footnote{
+    \href{https://json-schema.org/}{\textit{Json Schema}} è uno standard per la definizione della struttura di un
+    documento \textit{JSON} e la relativa validazione.
+}, il quale avrebbe risparmiato la scrittura di molta della logica di validazione dei file.\\
+La logica di serializzazione e deserializzazione è divisa in due parti:
+\begin{itemize}
+    \item Riguardante il modello: si occupa dei dati contenuti nella tabella, le eventuali intestazioni di righe e
+          colonne e i colori associati alle serie di dati.
+    \item Riguardante i grafici: si occupa delle proprietà specifiche dei grafici come il titolo, le proprietà degli
+          assi ed eventuali altre proprietà specifiche
+\end{itemize}
+
+\subsubsection{Serializzazione}
+\label{subsec:dynamicType}
+La serializzazione dei grafici è gestita mediante il metodo pubblico
+\mint{c++}|void serialize(QJsonObject& json) const|
+presente nella classe \texttt{AbstractChart}, il quale si occupa di serializzare gli attributi comuni a tutti
+i grafici (quelli quindi presenti in \texttt{AbstractChart}) tra cui il tipo dinamico (ricavato mediante un'invocazione
+al metodo virtuale puro \texttt{type()}), e di invocare il metodo virtuale
+\mint{c++}|void internalSerialize(QJsonObject& json) const|
+il quale si occupa della serializzazione degli attributi specifici del tipo di grafico in uso;
+il metodo prevede un'implementazione di default vuota in quanto un grafico non deve per forza avere altri attributi da
+deserializzare.
+
+\subsubsection{\textit{Self-Registering Factory} e deserializzazione}
+\label{subsec:factory}
+
+Per aumentare la facilità di estensione e per evitare di dover modificare la \textit{factory} ad ogni aggiunta di un
+tipo di grafico si è pensato di adottare il pattern \textit{Self-Registering Factory}.
+Differisce da una semplice \textit{factory} in quanto le classi non vanno registrate centralmente ma ogni classe
+provvede a registrare se stessa.
+All'atto pratico questo consiste nell'avere un campo statico booleano all'interno di ogni classe che deve poter essere
+costruita dalla factory inizializzato così
+\mint{c++}|bool registeredWithFactory = Factory::registerClass(MyClass::TYPE, &MyClass::deserialize);|
+È inoltre buona norma marcare questi campi con \texttt{\_\_attribute\_\_((unused))} in modo da comunicare al compilatore
+che è nostra intenzione che la variabile in questione non sia mai utilizzata, in modo da evitare warning inutili e
+per evitare che il compilatore elimini la variabile in caso il codice venga compilato con le ottimizzazioni abilitate.
+Il principale vantaggio di questa modalità rispetto ad una più classica \textit{factory} è che per supportare un nuovo
+tipo di dato non servono modifiche alla \textit{factory}.\\
+Ciò che permette alla factory di funzionare a basso livello è una mappa (in questo caso viene usata una \texttt{QMap},
+ma si avrebbe potuto usare anche una \texttt{std::unordered\_map} senza particolari differenze) che ha come chiavi
+i tipi di dato che è possibile deserializzare (quindi il risultato delle varie implementazioni di
+\texttt{AbstractChart::type()}) e come valori i metodi statici delle rispettive classi che istanziano un nuovo grafico a
+partire da un modello (i quali altro non sono che un sottile wrapper attorno al costruttore), sul grafico così costruito
+viene chiamato il metodo virtuale
+\mint{c++}{AbstractChart::deserialize(const QJsonObject& obj)}
+il quale si occupa della deserializzazione degli attributi del grafico.\\
+Uno dei problemi incontrati durante lo sviluppo della \textit{factory} è stato il fatto che in C++ l'ordine di
+inizializzazione dei campi statici è definito dall'implementazione e quindi non si possono fare assunzioni.
+Per evitare di ricadere nell'undefined behavior si è scelto di rendere la \textit{factory} un \textit{singleton}
+internamente, con i vari metodi pubblici statici che invocano dei metodi privati di esemplare che fanno le dovute
+operazioni.
+
+\subsection[GUI]{La GUI (Graphical User Interface)}
+La finestra principale (\texttt{MainWindow}) della \textbf{GUI} è basata sulla \texttt{QMainWindow} fornita da Qt, è
+inoltre presente un \textit{wizard} (\texttt{ChartWizard}) per aiutare l'utente a creare nuovi grafici e caricarne di
+esistenti.\\
+Tutta la logica di presentazione del grafico è racchiusa nella classe \texttt{MainView}, inizialmente è stato fatto per
+aumentare il \textit{decoupling} tra la parte grafica della finestra e la logica di raccordo tra GUI e l'accoppiata
+modello e grafico.
+In seguito questa divisione è tornata utile per l'implementazione delle schede che consentono di lavorare a più
+grafici contemporaneamente usando una sola istanza dell'applicazione.\\
+Sono anche presenti alcuni dialoghi modali (\texttt{EditChartDialog} e \texttt{EditColorsDialog}) pensati per
+modificare le proprietà del grafico in modo da non inquinare troppo l'interfaccia utente.
+
+\subsection{Note di implementazione}
+\begin{itemize}
+    \item In \texttt{MainWindow} viene fatto uso solo di \texttt{static\_cast} per i widget delle tab senza nessun
+          genere di controllo in quanto non necessario dato che le tab possono essere solo di tipo \texttt{MainView*}
+    \item Nella struttura dati \texttt{Vector2D} sono presenti degli usi di \texttt{assert()} che controllano la
+          validità di determinate precondizioni per la correttezza delle funzioni dove sono poste.
+          Le invocazioni sono state inserite nelle fasi di sviluppo iniziale del modello e mai rimosse in quanto non
+          hanno nessun costo nelle \textit{release builds} dell'applicazione.
+    \item È stata intenzionalmente violata la regola di separazione della \textit{business logic} dalla parte di GUI nel
+          metodo \texttt{ChartDataModel::removeColumns} in quanto è il modello a mostrare un dialogo d'errore in caso
+          di rimozione non valida, è stata una scelta pensata per ridurre al minimo la duplicazione del codice nei
+          punti in cui quel metodo viene invocato (ovvero in \texttt{MainWindow} ed in \texttt{EditChartDialog}).
+          Un altro motivo per cui si è preferita questa strada è che Qt in caso di rimozione fallita dal modello non
+          prevede l'uso di eccezioni o di codici di errore ma di un banale \texttt{return false;} il quale non è
+          abbastanza descrittivo e complica la futura estensibilità del codice in caso di aggiunta di motivi diversi per
+          il fallimento della rimozione.
+    \item Nei grafici che estendono \texttt{XYChart} non è imposto l'ordinamento dei valori della tabella sull'asse
+          X, inizialmente questa scelta può provocare confusione ma è stata fatta per lasciare maggior libertà possibile
+          all'utente.
+    \item Dove possibile è stato preferito usare tipi di Qt (ad esempio \texttt{QString}, \texttt{QVector} e
+          \texttt{QMap}) al posto degli equivalenti della \textbf{STL} per ridurre la necessità di onerose conversioni
+          (implicite ed esplicite); questa decisione non ha ovviamente inficiato sulla separazione tra dati e logica
+          di presentazione.
+    \item Per il \textit{mapping} del modello in serie di dati compatibili con la classe \texttt{QChart} sono stati
+          utilizzati i \texttt{ModelMapper} forniti da Qt, i quali hanno ampiamente semplificato la gestione degli
+          eventi del modello.
+    \item Per semplicità implementativa si è scelto di non ammortizzare le allocazioni nella struttura dati
+          \texttt{Vector2D}; ogni operazione che modifica le dimensioni del \texttt{Vector2D} provoca quindi una
+          riallocazione (con conseguente copia degli elementi contenuti).
+          È stata giudicata una scelta accettabile in quanto saranno sicuramente più frequenti gli accessi agli
+          elementi rispetto ai ridimensionamenti.\\
+\end{itemize}
